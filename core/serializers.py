@@ -33,10 +33,18 @@ class BookSerializer(serializers.ModelSerializer):
         source="author.name",
         read_only=True,
     )
+
     tags_details = TagSerializer(
         source="tags",
         many=True,
         read_only=True,
+    )
+
+    isbn = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=13,
     )
 
     class Meta:
@@ -55,3 +63,21 @@ class BookSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "created_at"]
+
+    def validate_isbn(self, value):
+        if value is None or not value.strip():
+            return None
+
+        value = value.strip()
+
+        queryset = Book.objects.filter(isbn=value)
+
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise serializers.ValidationError(
+                "Книга с таким ISBN уже существует."
+            )
+
+        return value
