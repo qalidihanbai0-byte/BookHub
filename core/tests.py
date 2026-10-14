@@ -95,6 +95,28 @@ class BookAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["title"], "API книга")
 
+    def test_anonymous_user_cannot_create_book(self):
+        anonymous_client = APIClient()
+
+        response = anonymous_client.post(
+            "/api/books/",
+            {
+                "title": "Запрещённая книга",
+                "description": "Попытка без авторизации",
+                "author": self.author.pk,
+                "rating": 5,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.assertFalse(
+            Book.objects.filter(
+                title="Запрещённая книга"
+            ).exists()
+        )
+
     def test_api_create_book(self):
         response = self.client_api.post(
             "/api/books/",
