@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Удаление книги — BookHub</title>
+</head>
+<body>
+    <h1>Удаление книги</h1>
+
+    <p>
+        Ты действительно хочешь удалить книгу
+        <strong>{{ book.title }}</strong>?
+    </p>
+
+    <p>Это действие нельзя отменить.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Да, удалить</button>
+        <a href="{% url 'book_detail' book.pk %}">Отмена</a>
+    </form>
+</body>
+</html>

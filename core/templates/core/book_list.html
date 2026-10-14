@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookHub — Каталог книг</title>
+</head>
+<body>
+    <h1>BookHub — Каталог книг</h1>
+
+    <p>
+        <a href="{% url 'book_create' %}">Добавить книгу</a>
+        |
+        <a href="/admin/">Админ-панель</a>
+    </p>
+
+    <form method="get" action="{% url 'book_list' %}">
+        <input
+            type="text"
+            name="q"
+            placeholder="Поиск по названию, автору или описанию"
+            value="{{ query }}"
+        >
+
+        <select name="rating">
+            <option value="">Все рейтинги</option>
+            {% for value in "0123456789"|make_list %}
+                <option value="{{ value }}"
+                    {% if selected_rating == value %}selected{% endif %}>
+                    {{ value }}
+                </option>
+            {% endfor %}
+            <option value="10"
+                {% if selected_rating == "10" %}selected{% endif %}>
+                10
+            </option>
+        </select>
+
+        <button type="submit">Найти</button>
+        <a href="{% url 'book_list' %}">Сбросить</a>
+    </form>
+
+    <hr>
+
+    {% for book in page_obj %}
+        <article>
+            <h2>
+                <a href="{% url 'book_detail' book.pk %}">
+                    {{ book.title }}
+                </a>
+            </h2>
+
+            <p><strong>Автор:</strong> {{ book.author.name }}</p>
+            <p><strong>Рейтинг:</strong> {{ book.rating }}/10</p>
+            <p>{{ book.description|truncatewords:30 }}</p>
+
+            <p>
+                <a href="{% url 'book_update' book.pk %}">Редактировать</a>
+                |
+                <a href="{% url 'book_delete' book.pk %}">Удалить</a>
+            </p>
+        </article>
+        <hr>
+    {% empty %}
+        <p>Книги не найдены. Попробуй изменить запрос или добавь новую книгу.</p>
+    {% endfor %}
+
+    <nav>
+        {% if page_obj.has_previous %}
+            <a href="?q={{ query|urlencode }}&rating={{ selected_rating }}&page=1">
+                Первая
+            </a>
+            <a href="?q={{ query|urlencode }}&rating={{ selected_rating }}&page={{ page_obj.previous_page_number }}">
+                Назад
+            </a>
+        {% endif %}
+
+        <span>
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?q={{ query|urlencode }}&rating={{ selected_rating }}&page={{ page_obj.next_page_number }}">
+                Вперёд
+            </a>
+            <a href="?q={{ query|urlencode }}&rating={{ selected_rating }}&page={{ page_obj.paginator.num_pages }}">
+                Последняя
+            </a>
+        {% endif %}
+    </nav>
+</body>
+</html>

@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} — BookHub</title>
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+
+    <p><strong>Автор:</strong> {{ book.author.name }}</p>
+
+    <p>
+        <strong>Дата публикации:</strong>
+        {{ book.published_date|default:"Не указана" }}
+    </p>
+
+    <p><strong>Рейтинг:</strong> {{ book.rating }}/10</p>
+
+    <p><strong>ISBN:</strong> {{ book.isbn|default:"Не указан" }}</p>
+
+    <h2>Описание</h2>
+    <p>{{ book.description|linebreaks }}</p>
+
+    <h2>Теги</h2>
+    {% for tag in book.tags.all %}
+        <span>{{ tag.name }}</span>
+    {% empty %}
+        <p>У книги пока нет тегов.</p>
+    {% endfor %}
+
+    <hr>
+
+    <p>
+        <a href="{% url 'book_update' book.pk %}">Редактировать</a>
+        |
+        <a href="{% url 'book_delete' book.pk %}">Удалить</a>
+        |
+        <a href="{% url 'book_list' %}">Назад к каталогу</a>
+    </p>
+</body>
+</html>
